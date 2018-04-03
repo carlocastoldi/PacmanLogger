@@ -18,9 +18,8 @@ class Logger(var logs: List[List[String]]) {
 	val titles = List("N  ","Date","Action","Version1","Version2","Packet")
 	val mainTable = new FilteredTable(titles, logs, true, screen, textGraphics) with Cursor
 	
-	//val filters = logs.map((l: List[String]) => List(l(2)))
-	val filters = List("DOWNGRADED","INSTALLED","REINSTALLED","REMOVED","UPGRADED")
-	val filterTable: OptionCursor = new OptionTable(List(" E","Filter By"), filters, List(true,true,true,true,true), mainTable, false, screen, textGraphics) with OptionCursor
+	val filters = logs.map((l: List[String]) => l(2)).distinct
+	val filterTable: OptionCursor = new OptionTable("Filter By", filters, List(true,true,true,true,true), mainTable, false, screen, textGraphics) with OptionCursor
 	var focussedTable: Cursor = mainTable
 	var mainTableOffset = 0
 	var focussedTableOffset = mainTableOffset

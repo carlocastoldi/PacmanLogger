@@ -49,22 +49,16 @@ class FilteredTable(titles: List[String], tuples: List[List[String]], fullScreen
 	def isLastRow = firstRow+nRows == filteredRows.length+1
 
 	override def draw(terminalSize: TerminalSize, offset: Integer) {
-		drawRows(terminalSize, 0,offset)
-		//drawFoot(terminalSize, terminalSize.getRows-1,offset)
-	}
-
-	def drawRows(terminalSize: TerminalSize, row: Int, column: Int) {
 		calcColWidths
 		tg.setForegroundColor(TextColor.ANSI.BLACK)
 		tg.setBackgroundColor(TextColor.ANSI.GREEN)
-		drawRow(titles, column, row)
+		drawRow(titles, offset, 0)
 		tg.setForegroundColor(TextColor.ANSI.CYAN)
 		tg.setBackgroundColor(TextColor.ANSI.DEFAULT)
 		val localRows = rows
 		localRows.zipWithIndex foreach {
-			case(r,i) => drawRow(r, column, row+i+1)
+			case(r,i) => drawRow(r, offset, i+1)
 		}
-		tg.setForegroundColor(TextColor.ANSI.DEFAULT)
 	}
 
 	override def drawRow(titles: List[String], column: Int, row: Int) {
@@ -85,7 +79,6 @@ class FilteredTable(titles: List[String], tuples: List[List[String]], fullScreen
 	override def scrollRows(n: Int) {
 	  val totalLength =  filteredRows.length
 	  val rowsLength = nRows
-	  // System.err.println(firstRow+"+"+n+"+"+rowsLength+" <= "+totalLength)
 	  if(firstRow+n >= 0 && firstRow+n+rowsLength <= totalLength)
 	    firstRow += n
 	  else if (firstRow+n >= 0 && firstRow+rowsLength <= totalLength)
@@ -109,8 +102,8 @@ class FilteredTable(titles: List[String], tuples: List[List[String]], fullScreen
 
 import scala.collection.immutable.HashMap
 
-class OptionTable(titles: List[String], tuples: List[String], options: List[Boolean], filteredT: FilteredTable, fullScreen: Boolean, screen: Screen, tg: TextGraphics)
-  extends FilteredTable(titles,
+class OptionTable(titles: String, tuples: List[String], options: List[Boolean], filteredT: FilteredTable, fullScreen: Boolean, screen: Screen, tg: TextGraphics)
+  extends FilteredTable(List("",titles),
     tuples.zip(options).map(t =>
       t match {
         case (s, true) => List("[X]",s)
@@ -141,11 +134,13 @@ class OptionTable(titles: List[String], tuples: List[String], options: List[Bool
   
   def switchOption(r: List[String]) = {
     settings.toList foreach {
-        case (s,true) if r(1) == s =>
-          settings = settings.updated(s,false)
-        case (s,false) if r(1) == s =>
-          settings = settings.updated(s,true)
-        case _ => ()
+      case (s,true) if r(1) == s =>
+        val values: List[Boolean] = settings.toList.unzip._2
+          if(values.indexOf(true) != values.lastIndexOf(true))
+            settings = settings.updated(s,false)
+      case (s,false) if r(1) == s =>
+        settings = settings.updated(s,true)
+      case _ => ()
     }
     filteredT.filter = setFilterFunction
   }
