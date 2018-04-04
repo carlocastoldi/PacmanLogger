@@ -1,6 +1,6 @@
 package pacmanlogger
 
-import java.io.{File,PrintWriter,IOException}
+import java.io.{File, PrintWriter, IOException}
 
 object PacmanLogger {
 	def main(args: Array[String]) = {
@@ -9,10 +9,10 @@ object PacmanLogger {
 		val p = new PacmanLoggerParser
 		val res = p.parseAll(p.logs, lines)
 		res match {
-			case p.Success(parsedLogs,_) =>
-				val logger = new Logger(parsedLogs.zipWithIndex.map{ case (x,n) => (n.toString)::x})
+			case p.Success(parsedLogs, _) =>
+				val logger = new Logger(parsedLogs.zipWithIndex.map { case (x, n) => (n.toString) :: x })
 				logger.start
-			case x => println("ERROR: " + x.toString)
+			case x => println("ERROR: "+x.toString)
 		}
 		src close
 	}
