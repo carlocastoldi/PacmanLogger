@@ -1,4 +1,4 @@
-package PacmanLogger
+package pacmanlogger
 
 import com.googlecode.lanterna._
 import com.googlecode.lanterna.screen._

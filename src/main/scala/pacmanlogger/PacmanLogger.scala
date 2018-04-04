@@ -1,4 +1,4 @@
-package PacmanLogger
+package pacmanlogger
 
 import java.io.{File,PrintWriter,IOException}
 

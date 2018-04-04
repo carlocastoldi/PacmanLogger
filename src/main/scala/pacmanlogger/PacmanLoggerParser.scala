@@ -1,4 +1,4 @@
-package PacmanLogger
+package pacmanlogger
 
 import scala.util.parsing.combinator._
 //import java.util.GregorianCalendar

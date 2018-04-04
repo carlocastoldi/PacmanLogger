@@ -1,4 +1,4 @@
-package PacmanLogger
+package pacmanlogger
 
 case class PktVersion(v1: String, v2: String) {
   def this(v: String) {
