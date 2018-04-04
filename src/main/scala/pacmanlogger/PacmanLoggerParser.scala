@@ -27,7 +27,7 @@ class PacmanLoggerParser extends JavaTokenParsers {
 	}
 	def action = ("downgraded" | "installed" | "removed" | "reinstalled" | "upgraded") ^^ { _ toUpperCase }
 	def pktName = "[a-zA-Z0-9\\+-_.]+".r <~ "("
-	def pktVers = "[a-z0-9.\\+-_:]+".r ~ opt("->" ~> "[a-z0-9.\\+-_:]+".r ) <~ ")" ^^ { v => v match {
+	def pktVers = "[^()\\s]+".r ~ opt("->" ~> "[^()\\s]+".r ) <~ ")" ^^ { v => v match {
 		case v1 ~ Some(v2) => PktVersion(v1,v2)
 		case v1 ~ None => new PktVersion(v1)
 	}}
