@@ -29,7 +29,7 @@ class Logger(var logs: List[List[String]]) {
 		
    	mainTable.draw(terminalSize, mainTableOffset)
    	var keyStroke = screen.pollInput();
-    while (keyStroke == null || KeyType.F3 != keyStroke.getKeyType) {
+    while (keyStroke == null || (KeyType.F3 != keyStroke.getKeyType && 'q' != keyStroke.getCharacter)) {
       val newSize = screen.doResizeIfNecessary
     	if (newSize != null){
     	  terminalSize = newSize
@@ -42,11 +42,14 @@ class Logger(var logs: List[List[String]]) {
      	  keyStroke.getKeyType match {
         		case KeyType.ArrowDown => focussedTable.moveCursor(1, textGraphics, focussedTableOffset, terminalSize)
         		case KeyType.ArrowUp => focussedTable.moveCursor(-1, textGraphics, focussedTableOffset, terminalSize)
-        		case KeyType.PageDown => focussedTable.moveCursor(terminalSize.getRows-3, textGraphics, focussedTableOffset, terminalSize)
-        		case KeyType.PageUp => focussedTable.moveCursor(-(terminalSize.getRows-3), textGraphics, focussedTableOffset, terminalSize)
+        		case KeyType.PageDown => focussedTable.moveCursor(terminalSize.getRows-2, textGraphics, focussedTableOffset, terminalSize)
+        		case KeyType.Home => focussedTable.moveCursorStart(textGraphics, focussedTableOffset, terminalSize)
+        		case KeyType.End => focussedTable.moveCursorEnd(textGraphics, focussedTableOffset, terminalSize)
+        		case KeyType.PageUp => focussedTable.moveCursor(-(terminalSize.getRows-2), textGraphics, focussedTableOffset, terminalSize)
         		case KeyType.F4 => state.f4
         		case KeyType.Escape => state.esc
         		case KeyType.Enter => state.enter
+        		case KeyType.Character => handleCharacter(keyStroke, state)
         		case _ => ()
       	}
      	  state = state.getNextState
@@ -82,4 +85,10 @@ class Logger(var logs: List[List[String]]) {
 	  }
 	  textGraphics.putString(offset, row, " "*(columns-offset))
 	}
+
+  def handleCharacter(keyStroke: KeyStroke, state: LoggerState) {
+    keyStroke.getCharacter.toChar match {
+      case 'f' => state.f4
+    }
+  }
 }

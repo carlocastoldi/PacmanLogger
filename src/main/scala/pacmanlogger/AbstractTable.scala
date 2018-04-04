@@ -10,7 +10,10 @@ trait AbstractTable {
   def updateValues: Unit
   def isLastRow: Boolean
   def scrollRows(n: Int): Unit
+  def scrollStart: Unit
+  def scrollEnd: Unit
   def getScreen: Screen
+  def getFirstRow: Int
   def getTextGraphics: TextGraphics
   def draw(terminalSize: TerminalSize, offset: Integer)
   def drawRow(titles: List[String], column: Int, row: Int)

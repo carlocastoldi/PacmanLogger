@@ -24,13 +24,46 @@ trait Cursor extends AbstractTable {
     (cursorRelativePos+n) match {
       case i if i >= 0 && i < nRows_ =>
         delCursor(offset)
-    		cursorRelativePos += n
-    		drawCursor(offset)
+        cursorRelativePos += n
+        drawCursor(offset)
       case i if !isLastRow =>
+        var firstRow_ = getFirstRow
         scrollRows(n)
+
+        delCursor(offset)
+        cursorRelativePos += n - (getFirstRow - firstRow_)
+
+        if (cursorRelativePos < 0) {
+          cursorRelativePos = 0
+        }
+
+        if (cursorRelativePos > nRows_ - 1) {
+          cursorRelativePos =  nRows_ - 1
+        }
+
+        drawCursor(offset)
         draw(terminalSize, offset)
       case _ => ()
     }
+  }
+
+  def moveCursorStart(tg: TextGraphics, offset: Int, terminalSize: TerminalSize) {
+    delCursor(offset)
+    cursorRelativePos = 0
+    drawCursor(offset)
+    scrollStart
+    draw(terminalSize, offset)
+  }
+
+  def moveCursorEnd(tg: TextGraphics, offset: Int, terminalSize: TerminalSize) {
+    rows_ = getRows
+    nRows_ = rows_.length
+
+    delCursor(offset)
+    cursorRelativePos = nRows_ - 1
+    drawCursor(offset)
+    scrollEnd
+    draw(terminalSize, offset)
   }
   
   def delCursor(offset: Int) {
