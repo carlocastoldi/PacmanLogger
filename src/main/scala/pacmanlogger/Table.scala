@@ -23,6 +23,7 @@ class FilteredTable(titles: List[String], tuples: List[List[String]], fullScreen
 	  }
 	  
   def getRows = rows
+  def getAllRows = filteredRows
 
   def updateRows =
     rows = nRows match {

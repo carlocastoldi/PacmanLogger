@@ -83,6 +83,7 @@ class Logger(var logs: List[List[String]]) {
 	  var offset = off
 	  val columns = terminalSize.getColumns()
 	  val row = terminalSize.getRows-1
+          var total = "Total " + mainTable.getAllRows.length
 	  commands foreach {
 	    case (k,c) =>
 	      textGraphics.setForegroundColor(TextColor.ANSI.CYAN)
@@ -94,7 +95,9 @@ class Logger(var logs: List[List[String]]) {
 		    textGraphics.putString(offset, row, c)
 		    offset += c.length
 	  }
+
 	  textGraphics.putString(offset, row, " "*(columns-offset))
+	  textGraphics.putString(offset + columns-offset-total.length, row, total)
 	}
 
   def handleCharacter(keyStroke: KeyStroke, state: LoggerState) {
