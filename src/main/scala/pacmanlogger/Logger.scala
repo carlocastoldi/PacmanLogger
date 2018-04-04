@@ -1,6 +1,8 @@
 package pacmanlogger
 
 import com.googlecode.lanterna._
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 import com.googlecode.lanterna.terminal._
 import com.googlecode.lanterna.screen._
 import com.googlecode.lanterna.input._
@@ -27,17 +29,23 @@ class Logger(var logs: List[List[String]]) {
 	def start {		
 		var state: LoggerState = new MainTableState(this, mainTable, screen)
 		
+		val f = Future {
+		  while(true) {
+        val newSize = screen.doResizeIfNecessary
+    	  if (newSize != null){
+      	  terminalSize = newSize
+      	  screen.clear()
+      	  mainTable.updateSize
+      	  filterTable.updateSize
+      	  draw(state)
+      	  screen.refresh()
+    	  }
+        Thread.sleep(100)
+		  }
+    }
    	mainTable.draw(terminalSize, mainTableOffset)
    	var keyStroke = screen.pollInput();
-    while (keyStroke == null || KeyType.F3 != keyStroke.getKeyType) {
-      val newSize = screen.doResizeIfNecessary
-    	if (newSize != null){
-    	  terminalSize = newSize
-    	  screen.clear()
-    	  mainTable.updateSize
-    	  filterTable.updateSize
-    	}
-    	
+    while (keyStroke == null || KeyType.F3 != keyStroke.getKeyType) {    	
     	if(keyStroke != null) {
      	  keyStroke.getKeyType match {
         		case KeyType.ArrowDown => focussedTable.moveCursor(1, textGraphics, focussedTableOffset, terminalSize)
@@ -54,16 +62,19 @@ class Logger(var logs: List[List[String]]) {
      	  filterTable.updateValues
     	}
     	screen.refresh()
-    	mainTable.draw(terminalSize,mainTableOffset)
-    	if(mainTableOffset > 0)
-    	  focussedTable.draw(terminalSize,0)
-    	drawFoot(state.getFoot, 0)
+    	draw(state)
     	screen.refresh()
-      // keyStroke = screen.pollInput
-    	keyStroke = screen.readInput  // forced to use blocking input reading to decrease significally CPU use
+    	keyStroke = screen.readInput
    	}
 		screen.close
 	}
+  
+  def draw(state: LoggerState) {
+    mainTable.draw(terminalSize,mainTableOffset)
+    if(mainTableOffset > 0)
+      focussedTable.draw(terminalSize,0)
+    drawFoot(state.getFoot, 0)
+  }
 	
 	def drawFoot(commands: List[(String,String)], off: Int) {
 	  var offset = off
