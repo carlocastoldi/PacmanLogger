@@ -23,6 +23,7 @@ class FilteredTable(titles: List[String], tuples: List[List[String]], fullScreen
 	}
 
 	def getRows = rows
+	def getAllRows = filteredRows
 
 	def updateRows =
 		rows = nRows match {
@@ -45,6 +46,7 @@ class FilteredTable(titles: List[String], tuples: List[List[String]], fullScreen
 
 	override def getScreen = screen
 	override def getTextGraphics = tg
+	override def getFirstRow = firstRow
 
 	def isLastRow = firstRow + nRows == filteredRows.length + 1
 
@@ -86,6 +88,17 @@ class FilteredTable(titles: List[String], tuples: List[List[String]], fullScreen
 			firstRow = totalLength - rowsLength
 		else if (firstRow > 0 && firstRow + n + rowsLength <= totalLength)
 			firstRow = 0
+	}
+
+	override def scrollStart {
+		firstRow = 0
+	}
+
+	override def scrollEnd {
+		val totalLength = filteredRows.length
+		val rowsLength = nRows
+
+		firstRow = totalLength - rowsLength
 	}
 
 	def calcColWidths {
