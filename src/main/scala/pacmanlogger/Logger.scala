@@ -44,17 +44,20 @@ class Logger(var logs: List[List[String]]) {
 			}
 		}
 		mainTable.draw(terminalSize, mainTableOffset)
-		var keyStroke = screen.pollInput();
-		while (keyStroke == null || KeyType.F3 != keyStroke.getKeyType) {
+		var keyStroke = screen.pollInput()
+		while (keyStroke == null || (KeyType.F3 != keyStroke.getKeyType && 'q' != keyStroke.getCharacter)) {
 			if (keyStroke != null) {
 				keyStroke.getKeyType match {
 					case KeyType.ArrowDown => focussedTable.moveCursor(1, textGraphics, focussedTableOffset, terminalSize)
 					case KeyType.ArrowUp => focussedTable.moveCursor(-1, textGraphics, focussedTableOffset, terminalSize)
-					case KeyType.PageDown => focussedTable.moveCursor(terminalSize.getRows - 3, textGraphics, focussedTableOffset, terminalSize)
-					case KeyType.PageUp => focussedTable.moveCursor(-(terminalSize.getRows - 3), textGraphics, focussedTableOffset, terminalSize)
+					case KeyType.PageDown => focussedTable.moveCursor(terminalSize.getRows - 2, textGraphics, focussedTableOffset, terminalSize)
+					case KeyType.Home => focussedTable.moveCursorStart(textGraphics, focussedTableOffset, terminalSize)
+					case KeyType.End => focussedTable.moveCursorEnd(textGraphics, focussedTableOffset, terminalSize)
+					case KeyType.PageUp => focussedTable.moveCursor(-(terminalSize.getRows - 2), textGraphics, focussedTableOffset, terminalSize)
 					case KeyType.F4 => state.f4
 					case KeyType.Escape => state.esc
 					case KeyType.Enter => state.enter
+					case KeyType.Character => handleCharacter(keyStroke, state)
 					case _ => ()
 				}
 				state = state.getNextState
@@ -80,6 +83,7 @@ class Logger(var logs: List[List[String]]) {
 		var offset = off
 		val columns = terminalSize.getColumns()
 		val row = terminalSize.getRows - 1
+		var total = "Total "+mainTable.getAllRows.length
 		commands foreach {
 			case (k, c) =>
 				textGraphics.setForegroundColor(TextColor.ANSI.CYAN)
@@ -91,6 +95,14 @@ class Logger(var logs: List[List[String]]) {
 				textGraphics.putString(offset, row, c)
 				offset += c.length
 		}
+
 		textGraphics.putString(offset, row, " " * (columns - offset))
+		textGraphics.putString(offset + columns - offset - total.length, row, total)
+	}
+
+	def handleCharacter(keyStroke: KeyStroke, state: LoggerState) {
+		keyStroke.getCharacter.toChar match {
+			case 'f' => state.f
+		}
 	}
 }
