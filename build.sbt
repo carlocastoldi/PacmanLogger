@@ -1,6 +1,6 @@
 name := "PacmanLogger"
 
-version := "0.1.1b"
+version := "0.1.2"
 
 scalaVersion := "2.12.4"
 
