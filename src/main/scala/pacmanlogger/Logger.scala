@@ -103,6 +103,7 @@ class Logger(var logs: List[List[String]]) {
 	def handleCharacter(keyStroke: KeyStroke, state: LoggerState) {
 		keyStroke.getCharacter.toChar match {
 			case 'f' => state.f
+			case _ => ()
 		}
 	}
 }
