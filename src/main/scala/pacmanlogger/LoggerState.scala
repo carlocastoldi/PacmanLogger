@@ -8,6 +8,7 @@ trait LoggerState {
   val table: AbstractTable
   def getFoot: List[(String,String)]
   def f4: Unit
+  def f: Unit
   def esc: Unit
   def enter: Unit
   def getNextState: LoggerState
@@ -25,6 +26,7 @@ class MainTableState(logger: Logger, val table: AbstractTable, screen: Screen) e
     logger.focussedTableOffset = 0
     screen.clear()
   }
+  override def f = f4
   override def esc = ()
   override def enter = ()
 }
@@ -35,6 +37,7 @@ class FilterTableState(logger: Logger, val table: OptionCursor, screen: Screen) 
   override def getNextState = nextState
   override def getFoot = List(("Enter","Enable"),("ESC","Accept"))
   override def f4 = ()
+  override def f = esc
   override def esc = {
     nextState = new MainTableState(logger, logger.filterTable, screen)
     logger.focussedTable = logger.mainTable
