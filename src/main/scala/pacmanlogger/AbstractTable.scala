@@ -7,6 +7,7 @@ import com.googlecode.lanterna.terminal._
 
 trait AbstractTable {
 	def getRows: List[List[String]]
+//	def setAllRows(newTuples: List[List[String]]): Unit
 	def getAllRows: List[List[String]]
 	def updateValues: Unit
 	def isLastRow: Boolean

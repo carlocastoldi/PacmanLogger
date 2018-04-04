@@ -5,50 +5,43 @@ import com.googlecode.lanterna.screen._
 import com.googlecode.lanterna.graphics._
 import com.googlecode.lanterna.terminal._
 
-class FilteredTable(titles: List[String], tuples: List[List[String]], fullScreen: Boolean, screen: Screen, tg: TextGraphics)
+class Table(titles: List[String], var tuples: List[List[String]], fullScreen: Boolean, screen: Screen, tg: TextGraphics)
 	extends AbstractTable {
 
 	var colWidths = new Array[Int](titles.length)
 	var terminalSize = screen.getTerminalSize
 	var firstRow = 0
-	var filter = (t: List[String]) => true
-	var filteredRows: List[List[String]] = tuples
 	var nRows: Int = screen.getTerminalSize.getRows - 2
-	var rows: List[List[String]] = nRows match {
-		case n if n > filteredRows.length =>
-			filteredRows
-		case n if n > (filteredRows.length - firstRow) =>
-			filteredRows.drop(terminalSize.getRows)
-		case _ => filteredRows.drop(firstRow).take(nRows)
-	}
+	var rows: List[List[String]] = updateRows
 
 	def getRows = rows
-	def getAllRows = filteredRows
+	def getAllRows = tuples
 
 	def updateRows =
-		rows = nRows match {
-			case n if n > filteredRows.length =>
-				filteredRows
-			case n if n > (filteredRows.length - firstRow) =>
-				filteredRows.drop(terminalSize.getRows)
-			case _ => filteredRows.drop(firstRow).take(nRows)
+		nRows match {
+			case n if n > tuples.length =>
+				tuples
+			case n if n > (tuples.length - firstRow) =>
+				tuples.drop(terminalSize.getRows)
+			case _ => tuples.drop(firstRow).take(nRows)
 		}
+	
 	def updateSize = {
 		terminalSize = screen.getTerminalSize
-		updateRows
+		nRows = terminalSize.getRows - 2
+		rows = updateRows
 	}
 
 	def updateValues = {
-		nRows = screen.getTerminalSize.getRows - 2
-		filteredRows = tuples.filter(filter)
-		updateRows
+		nRows = terminalSize.getRows - 2
+		rows = updateRows
 	}
 
 	override def getScreen = screen
 	override def getTextGraphics = tg
 	override def getFirstRow = firstRow
 
-	def isLastRow = firstRow + nRows == filteredRows.length + 1
+	def isLastRow = firstRow + nRows == tuples.length + 1
 
 	override def draw(terminalSize: TerminalSize, offset: Integer) {
 		calcColWidths
@@ -80,7 +73,7 @@ class FilteredTable(titles: List[String], tuples: List[List[String]], fullScreen
 	}
 
 	override def scrollRows(n: Int) {
-		val totalLength = filteredRows.length
+		val totalLength = tuples.length
 		val rowsLength = nRows
 		if (firstRow + n >= 0 && firstRow + n + rowsLength <= totalLength)
 			firstRow += n
@@ -95,7 +88,7 @@ class FilteredTable(titles: List[String], tuples: List[List[String]], fullScreen
 	}
 
 	override def scrollEnd {
-		val totalLength = filteredRows.length
+		val totalLength = tuples.length
 		val rowsLength = nRows
 
 		firstRow = totalLength - rowsLength
@@ -111,55 +104,5 @@ class FilteredTable(titles: List[String], tuples: List[List[String]], fullScreen
 				case _ => ()
 			}
 		}
-	}
-}
-
-import scala.collection.immutable.HashMap
-
-class OptionTable(titles: String, tuples: List[String], options: List[Boolean], filteredT: FilteredTable, fullScreen: Boolean, screen: Screen, tg: TextGraphics)
-	extends FilteredTable(List("", titles),
-		tuples.zip(options).map(t =>
-			t match {
-				case (s, true) => List("[X]", s)
-				case (s, false) => List("[ ]", s)
-			}), fullScreen, screen, tg) {
-
-	var settings: HashMap[String, Boolean] = {
-		var m = new HashMap[String, Boolean]
-		tuples.zip(options) foreach {
-			case (action, option) => m = m.updated(action, option)
-		}
-		m
-	}
-
-	override def updateValues = {
-		nRows = terminalSize.getRows - 2
-		filteredRows = {
-			settings.toList map { (t: (String, Boolean)) =>
-				t match {
-					case (s, true) => List("[X]", s)
-					case (s, false) => List("[ ]", s)
-				}
-			}
-		}
-		updateRows
-	}
-
-	def switchOption(r: List[String]) = {
-		settings.toList foreach {
-			case (s, true) if r(1) == s =>
-				val values: List[Boolean] = settings.toList.unzip._2
-				if (values.indexOf(true) != values.lastIndexOf(true))
-					settings = settings.updated(s, false)
-			case (s, false) if r(1) == s =>
-				settings = settings.updated(s, true)
-			case _ => ()
-		}
-		filteredT.filter = setFilterFunction
-	}
-
-	def setFilterFunction = {
-		t: List[String] =>
-			settings.getOrElse(t(2), false)
 	}
 }

@@ -46,8 +46,7 @@ class FilterTableState(logger: Logger, val table: OptionCursor, screen: Screen) 
 		screen.clear()
 	}
 	override def enter {
-		table.switchOption(table.getSelectedRow)
-		table.updateValues
+		table.click
 		screen.clear()
 	}
 }

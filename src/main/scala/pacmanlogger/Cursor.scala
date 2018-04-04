@@ -58,7 +58,6 @@ trait Cursor extends AbstractTable {
 	def moveCursorEnd(tg: TextGraphics, offset: Int, terminalSize: TerminalSize) {
 		rows_ = getRows
 		nRows_ = rows_.length
-
 		delCursor(offset)
 		cursorRelativePos = nRows_ - 1
 		drawCursor(offset)
@@ -72,6 +71,11 @@ trait Cursor extends AbstractTable {
 		nRows_ = rows_.length
 		tg.setForegroundColor(TextColor.ANSI.CYAN)
 		tg.setBackgroundColor(TextColor.ANSI.DEFAULT)
+		nRows_ match {
+//			case 0  => // Crashes!
+			case n if n <= cursorRelativePos => cursorRelativePos = n-1
+			case _ => ()
+		}
 		drawRow(rows_(cursorRelativePos), offset, cursorRelativePos + 1)
 	}
 
@@ -81,10 +85,15 @@ trait Cursor extends AbstractTable {
 		nRows_ = rows_.length
 		tg.setForegroundColor(TextColor.ANSI.BLACK)
 		tg.setBackgroundColor(TextColor.ANSI.CYAN)
+		nRows_ match {
+//			case 0  => // Crashes!
+			case n if n <= cursorRelativePos => cursorRelativePos = n-1
+			case _ => ()
+		}
 		drawRow(rows_(cursorRelativePos), offset, cursorRelativePos + 1)
 	}
 }
 
 trait OptionCursor extends OptionTable with Cursor {
-	def getSelectedRow = rows_(cursorRelativePos)
+	def click = switchOption(rows_(cursorRelativePos))
 }
