@@ -5,7 +5,7 @@ import com.googlecode.lanterna.screen._
 import com.googlecode.lanterna.graphics._
 import com.googlecode.lanterna.terminal._
 
-class Table(titles: List[String], var tuples: List[List[String]], fullScreen: Boolean, screen: Screen, tg: TextGraphics)
+class Table(val titles: List[String], var tuples: List[List[String]], fullScreen: Boolean, screen: Screen, tg: TextGraphics)
 	extends AbstractTable {
 
 	var colWidths = new Array[Int](titles.length)
@@ -13,15 +13,16 @@ class Table(titles: List[String], var tuples: List[List[String]], fullScreen: Bo
 	var firstRow = 0
 	var nRows: Int = screen.getTerminalSize.getRows - 2
 	var rows: List[List[String]] = updateRows
+	var tuplesLength = tuples.length
 
 	def getRows = rows
 	def getAllRows = tuples
 
 	def updateRows =
 		nRows match {
-			case n if n > tuples.length =>
+			case n if n > tuplesLength =>
 				tuples
-			case n if n > (tuples.length - firstRow) =>
+			case n if n > (tuplesLength - firstRow) =>
 				tuples.drop(terminalSize.getRows)
 			case _ => tuples.drop(firstRow).take(nRows)
 		}
@@ -35,13 +36,14 @@ class Table(titles: List[String], var tuples: List[List[String]], fullScreen: Bo
 	def updateValues = {
 		nRows = terminalSize.getRows - 2
 		rows = updateRows
+		tuplesLength = tuples.length
 	}
 
 	override def getScreen = screen
 	override def getTextGraphics = tg
 	override def getFirstRow = firstRow
 
-	def isLastRow = firstRow + nRows == tuples.length + 1
+	def isLastRow = firstRow + nRows == tuplesLength + 1
 
 	override def draw(terminalSize: TerminalSize, offset: Integer) {
 		calcColWidths
@@ -73,7 +75,7 @@ class Table(titles: List[String], var tuples: List[List[String]], fullScreen: Bo
 	}
 
 	override def scrollRows(n: Int) {
-		val totalLength = tuples.length
+		val totalLength = tuplesLength
 		val rowsLength = nRows
 		if (firstRow + n >= 0 && firstRow + n + rowsLength <= totalLength)
 			firstRow += n
@@ -88,7 +90,7 @@ class Table(titles: List[String], var tuples: List[List[String]], fullScreen: Bo
 	}
 
 	override def scrollEnd {
-		val totalLength = tuples.length
+		val totalLength = tuplesLength
 		val rowsLength = nRows
 
 		firstRow = totalLength - rowsLength
