@@ -14,19 +14,18 @@ abstract class OptionTable(title: String, optionTuples: List[String], options: L
 	
 	def switchOption(r: List[String]): Unit
 	
-	var settings: HashMap[String, Boolean] = {
-		var m = new HashMap[String, Boolean]
+	var settings: List[(String, Boolean)] = {
+		var m = List[(String, Boolean)]()
 		optionTuples.zip(options) foreach {
-			case (action, option) => m = m.updated(action, option)
+			case (action, option) => m = m :+(action, option)
 		}
 		m
 	}
 
 	override def updateValues = {
 		nRows = terminalSize.getRows - 2
-		val settingsList = settings.toList.sortWith(_._1<_._1)
 		tuples = {
-			settingsList.toList map { (t: (String, Boolean)) =>
+			settings map { (t: (String, Boolean)) =>
 				t match {
 					case (s, true) => List("[X]", s)
 					case (s, false) => List("[ ]", s)
@@ -41,13 +40,13 @@ class FilterTable(title: String, tuples: List[String], options: List[Boolean], f
 	extends OptionTable(title, tuples, options, filterableTable, fullScreen, screen, tg) {
 	
 	override def switchOption(r: List[String]) = {
-		settings.toList foreach {
-			case (s, true) if r(1) == s =>
-				val values: List[Boolean] = settings.toList.unzip._2
+		settings.zipWithIndex foreach {
+			case ((s, true),i) if r(1) == s =>
+				val values: List[Boolean] = settings.unzip._2
 				if (values.indexOf(true) != values.lastIndexOf(true))
-					settings = settings.updated(s, false)
-			case (s, false) if r(1) == s =>
-				settings = settings.updated(s, true)
+					settings = settings.updated(i,(s, false))
+			case ((s, false),i) if r(1) == s =>
+				settings = settings.updated(i,(s, true))
 			case _ => ()
 		}
 		filterableTable.setFilterFunction(filterFunction)
@@ -55,8 +54,9 @@ class FilterTable(title: String, tuples: List[String], options: List[Boolean], f
 	}
 	
 	def filterFunction = {
+		val settingsMap = settings.toMap
 		t: List[String] =>
-			settings.getOrElse(t(2), false)
+			settingsMap.getOrElse(t(2), false)
 	}
 }
 
@@ -72,9 +72,9 @@ class SortByTable(title: String, var index: Int, sortableTable: Sortable, fullSc
 		sortingTitles.zipWithIndex foreach {
 			case (s,i) if r(1) == s  =>
 				index = i
-				settings = settings.updated(s, true)
-			case (s,_) => ()
-				settings = settings.updated(s, false)
+				settings = settings.updated(i, (s,true))
+			case (s,i) =>
+				settings = settings.updated(i, (s,false))
 		}
 		sortableTable.sortByIndex(index)
 		sortableTable.updateValues
