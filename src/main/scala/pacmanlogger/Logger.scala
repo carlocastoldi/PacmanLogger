@@ -17,10 +17,10 @@ class Logger(var logs: List[List[String]]) {
 	val textGraphics = screen.newTextGraphics
 	var terminalSize = screen.getTerminalSize
 
-	val titles = List("N  ", "Date", "Action", "Version1", "Version2", "Packet")
+	val titles = List("Date", "Action", "Version1", "Version2", "Packet")
 	val mainTable = new Table(titles, logs, true, screen, textGraphics) with Filterable with Sortable with Cursor
-	val filters = logs.map((l: List[String]) => l(2)).distinct.sortWith(_<_)
-	val filterTable = new FilterTable("Filter By", filters, List(true, true, true, true, true), mainTable, false, screen, textGraphics) with OptionCursor
+	val filters = logs.map((l: List[String]) => l(1)).distinct.sortWith(_<_)
+	val filterTable = new FilterTable("Filter By", filters, 1, mainTable, false, screen, textGraphics) with OptionCursor
 	val sortByTable = new SortByTable("Sort By", 1, mainTable, false, screen, textGraphics) with OptionCursor
 	
 	var focussedTable: Cursor = mainTable

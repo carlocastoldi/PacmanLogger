@@ -10,7 +10,7 @@ object PacmanLogger {
 		val res = p.parseAll(p.logs, lines)
 		res match {
 			case p.Success(parsedLogs, _) =>
-				val logger = new Logger(parsedLogs.zipWithIndex.map { case (x, n) => (n.toString) :: x })
+				val logger = new Logger(parsedLogs)
 				logger.start
 			case x => println("ERROR: "+x.toString)
 		}

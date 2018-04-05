@@ -36,8 +36,12 @@ abstract class OptionTable(title: String, optionTuples: List[String], options: L
 	}
 }
 
-class FilterTable(title: String, tuples: List[String], options: List[Boolean], filterableTable: Filterable, fullScreen: Boolean, screen: Screen, tg: TextGraphics)
+class FilterTable(title: String, tuples: List[String], index: Int, options: List[Boolean], filterableTable: Filterable, fullScreen: Boolean, screen: Screen, tg: TextGraphics)
 	extends OptionTable(title, tuples, options, filterableTable, fullScreen, screen, tg) {
+	
+	def this(title: String, tuples: List[String], index: Int, filterableTable: Filterable, fullScreen: Boolean, screen: Screen, tg: TextGraphics) {
+		this(title, tuples, index, List(true, true, true, true, true), filterableTable, fullScreen, screen, tg)
+	}
 	
 	override def switchOption(r: List[String]) = {
 		settings.zipWithIndex foreach {
@@ -56,7 +60,7 @@ class FilterTable(title: String, tuples: List[String], options: List[Boolean], f
 	def filterFunction = {
 		val settingsMap = settings.toMap
 		t: List[String] =>
-			settingsMap.getOrElse(t(2), false)
+			settingsMap.getOrElse(t(index), false)
 	}
 }
 

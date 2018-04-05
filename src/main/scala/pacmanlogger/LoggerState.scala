@@ -62,7 +62,7 @@ class SortByTableState(logger: Logger, val table: OptionCursor, screen: Screen) 
 	var nextState: LoggerState = this
 
 	override def getNextState = nextState
-	override def getFoot = List(("Space", "Sort  "), ("Esc", "Cancel"))
+	override def getFoot = List(("Space", "Sort  "), ("Esc", "Done  "))
 	override def s = esc
 	override def esc = {
 		nextState = new MainTableState(logger, logger.mainTable, screen)
