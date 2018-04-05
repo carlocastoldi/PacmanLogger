@@ -14,7 +14,7 @@ class FilterableTable(titles: List[String], totalTuples: List[List[String]], ful
 		tuples = totalTuples.filter(filter)
 	}
 	
-	def setFilter(f: List[String] => Boolean) = {
+	def setFilterFunction(f: List[String] => Boolean) = {
 		filter = f
 		tuples = totalTuples.filter(filter)
 	}

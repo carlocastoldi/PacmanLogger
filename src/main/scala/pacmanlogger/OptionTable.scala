@@ -4,9 +4,9 @@ import scala.collection.immutable.HashMap
 import com.googlecode.lanterna.screen._
 import com.googlecode.lanterna.graphics._
 
-abstract class OptionTable(title: String, var optionTuples: List[String], options: List[Boolean], subjectTable: FilterableTable, fullScreen: Boolean, screen: Screen, tg: TextGraphics)
+abstract class OptionTable(title: String, optionTuples: List[String], options: List[Boolean], subjectTable: FilterableTable, fullScreen: Boolean, screen: Screen, tg: TextGraphics)
 	extends Table(List("", title),
-		optionTuples.zip(options).map(t =>
+		optionTuples.sortWith(_<_).zip(options).map(t =>
 			t match {
 				case (s, true) => List("[X]", s)
 				case (s, false) => List("[ ]", s)
@@ -16,7 +16,6 @@ abstract class OptionTable(title: String, var optionTuples: List[String], option
 	
 	var settings: HashMap[String, Boolean] = {
 		var m = new HashMap[String, Boolean]
-
 		optionTuples.zip(options) foreach {
 			case (action, option) => m = m.updated(action, option)
 		}
@@ -25,8 +24,9 @@ abstract class OptionTable(title: String, var optionTuples: List[String], option
 
 	override def updateValues = {
 		nRows = terminalSize.getRows - 2
+		val settingsList = settings.toList.sortWith(_._1<_._1)
 		tuples = {
-			settings.toList map { (t: (String, Boolean)) =>
+			settingsList.toList map { (t: (String, Boolean)) =>
 				t match {
 					case (s, true) => List("[X]", s)
 					case (s, false) => List("[ ]", s)
@@ -50,10 +50,11 @@ class FilterTable(title: String, tuples: List[String], options: List[Boolean], f
 				settings = settings.updated(s, true)
 			case _ => ()
 		}
-		filteredTable.filter = setFilterFunction
+		filteredTable.setFilterFunction(filterFunction)
+		filteredTable.updateValues
 	}
 	
-	def setFilterFunction = {
+	def filterFunction = {
 		t: List[String] =>
 			settings.getOrElse(t(2), false)
 	}

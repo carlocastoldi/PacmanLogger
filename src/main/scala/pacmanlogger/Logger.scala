@@ -61,10 +61,7 @@ class Logger(var logs: List[List[String]]) {
 					case _ => ()
 				}
 				state = state.getNextState
-				mainTable.updateValues
-				filterTable.updateValues
 			}
-			screen.refresh()
 			draw(state)
 			screen.refresh()
 			keyStroke = screen.readInput
