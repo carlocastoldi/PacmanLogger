@@ -6,7 +6,7 @@ import com.googlecode.lanterna.graphics._
 
 abstract class OptionTable(title: String, optionTuples: List[String], options: List[Boolean], subjectTable: Table, fullScreen: Boolean, screen: Screen, tg: TextGraphics)
 	extends Table(List("", title),
-		optionTuples.sortWith(_<_).zip(options).map(t =>
+		optionTuples.zip(options).map(t =>
 			t match {
 				case (s, true) => List("[X]", s)
 				case (s, false) => List("[ ]", s)
@@ -73,9 +73,8 @@ class SortByTable(title: String, var index: Int, sortableTable: Sortable, fullSc
 			case (s,i) if r(1) == s  =>
 				index = i
 				settings = settings.updated(s, true)
-			case (s,i) if r(1) != s =>
+			case (s,_) => ()
 				settings = settings.updated(s, false)
-			case _ => ()
 		}
 		sortableTable.sortByIndex(index)
 		sortableTable.updateValues

@@ -13,14 +13,14 @@ abstract class LoggerState {
 	def f: Unit = ()
 	def s: Unit = ()
 	def esc: Unit = ()
-	def enter: Unit = ()
+	def space: Unit = ()
 }
 
 class MainTableState(logger: Logger, val table: AbstractTable, screen: Screen) extends LoggerState {
 	var nextState: LoggerState = this
 
 	override def getNextState = nextState
-	override def getFoot = List(("F3", "Quit"), ("F4", "Filter"), ("F5","SortBy")/*,("F6","Search")*/ )
+	override def getFoot = List(("F3", "Quit  "), ("F4", "Filter"), ("F5","SortBy")/*,("F6","Search")*/ )
 	override def f4 = {
 		nextState = new FilterTableState(logger, logger.filterTable, screen)
 		logger.focussedTable = logger.filterTable
@@ -43,7 +43,7 @@ class FilterTableState(logger: Logger, val table: OptionCursor, screen: Screen) 
 	var nextState: LoggerState = this
 
 	override def getNextState = nextState
-	override def getFoot = List(("Enter", "Enable"), ("ESC", "Accept"))
+	override def getFoot = List(("Space ", "Enable"), ("Esc", "Done  "))
 	override def f = esc
 	override def esc = {
 		nextState = new MainTableState(logger, logger.mainTable, screen)
@@ -52,7 +52,7 @@ class FilterTableState(logger: Logger, val table: OptionCursor, screen: Screen) 
 		logger.focussedTableOffset = 0
 		screen.clear()
 	}
-	override def enter {
+	override def space {
 		table.click
 		screen.clear()
 	}
@@ -62,7 +62,7 @@ class SortByTableState(logger: Logger, val table: OptionCursor, screen: Screen) 
 	var nextState: LoggerState = this
 
 	override def getNextState = nextState
-	override def getFoot = List(("Enter", "Sort"), ("ESC", "Cancel"))
+	override def getFoot = List(("Space", "Sort  "), ("Esc", "Cancel"))
 	override def s = esc
 	override def esc = {
 		nextState = new MainTableState(logger, logger.mainTable, screen)
@@ -71,7 +71,7 @@ class SortByTableState(logger: Logger, val table: OptionCursor, screen: Screen) 
 		logger.focussedTableOffset = 0
 		screen.clear()
 	}
-	override def enter {
+	override def space {
 		table.click
 		screen.clear()
 	}

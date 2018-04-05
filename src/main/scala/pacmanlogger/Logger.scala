@@ -19,7 +19,7 @@ class Logger(var logs: List[List[String]]) {
 
 	val titles = List("N  ", "Date", "Action", "Version1", "Version2", "Packet")
 	val mainTable = new Table(titles, logs, true, screen, textGraphics) with Filterable with Sortable with Cursor
-	val filters = logs.map((l: List[String]) => l(2)).distinct
+	val filters = logs.map((l: List[String]) => l(2)).distinct.sortWith(_<_)
 	val filterTable = new FilterTable("Filter By", filters, List(true, true, true, true, true), mainTable, false, screen, textGraphics) with OptionCursor
 	val sortByTable = new SortByTable("Sort By", 1, mainTable, false, screen, textGraphics) with OptionCursor
 	
@@ -47,7 +47,7 @@ class Logger(var logs: List[List[String]]) {
 		}
 		mainTable.draw(terminalSize, mainTableOffset)
 		var keyStroke = screen.pollInput()
-		while (keyStroke == null || (KeyType.F3 != keyStroke.getKeyType && 'q' != keyStroke.getCharacter)) {
+		while (keyStroke == null || (KeyType.F3 != keyStroke.getKeyType && 'q' != keyStroke.getCharacter) || focussedTable != mainTable) {
 			if (keyStroke != null) {
 				keyStroke.getKeyType match {
 					case KeyType.ArrowDown => focussedTable.moveCursor(1, textGraphics, focussedTableOffset, terminalSize)
@@ -59,7 +59,6 @@ class Logger(var logs: List[List[String]]) {
 					case KeyType.F4 => state.f4
 					case KeyType.F5 => state.f5
 					case KeyType.Escape => state.esc
-					case KeyType.Enter => state.enter
 					case KeyType.Character => handleCharacter(keyStroke, state)
 					case _ => ()
 				}
@@ -102,6 +101,7 @@ class Logger(var logs: List[List[String]]) {
 
 	def handleCharacter(keyStroke: KeyStroke, state: LoggerState) {
 		keyStroke.getCharacter.toChar match {
+			case ' ' => state.space
 			case 'f' => state.f
 			case 's' => state.s
 			case _ => ()
