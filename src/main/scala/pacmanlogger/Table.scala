@@ -5,7 +5,7 @@ import com.googlecode.lanterna.screen._
 import com.googlecode.lanterna.graphics._
 import com.googlecode.lanterna.terminal._
 
-class Table(titles: List[String], var tuples: List[List[String]], fullScreen: Boolean, screen: Screen, tg: TextGraphics)
+class Table(val titles: List[String], var tuples: List[List[String]], fullScreen: Boolean, screen: Screen, tg: TextGraphics)
 	extends AbstractTable {
 
 	var colWidths = new Array[Int](titles.length)

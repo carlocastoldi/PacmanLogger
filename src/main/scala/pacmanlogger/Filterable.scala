@@ -3,9 +3,9 @@ package pacmanlogger
 import com.googlecode.lanterna.screen._
 import com.googlecode.lanterna.graphics._
 
-class FilterableTable(titles: List[String], totalTuples: List[List[String]], fullScreen: Boolean, screen: Screen, tg: TextGraphics)
-	extends Table(titles, totalTuples, fullScreen, screen, tg) {
-	
+trait Filterable extends Table {
+	val totalTuples = tuples
+		
 	var filter = (t: List[String]) => true
 	tuples = totalTuples.filter(filter)
 	

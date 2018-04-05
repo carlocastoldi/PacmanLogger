@@ -4,7 +4,7 @@ import scala.collection.immutable.HashMap
 import com.googlecode.lanterna.screen._
 import com.googlecode.lanterna.graphics._
 
-abstract class OptionTable(title: String, optionTuples: List[String], options: List[Boolean], subjectTable: FilterableTable, fullScreen: Boolean, screen: Screen, tg: TextGraphics)
+abstract class OptionTable(title: String, optionTuples: List[String], options: List[Boolean], subjectTable: Table, fullScreen: Boolean, screen: Screen, tg: TextGraphics)
 	extends Table(List("", title),
 		optionTuples.sortWith(_<_).zip(options).map(t =>
 			t match {
@@ -37,8 +37,8 @@ abstract class OptionTable(title: String, optionTuples: List[String], options: L
 	}
 }
 
-class FilterTable(title: String, tuples: List[String], options: List[Boolean], filteredTable: FilterableTable, fullScreen: Boolean, screen: Screen, tg: TextGraphics)
-	extends OptionTable(title, tuples, options, filteredTable, fullScreen, screen, tg) {
+class FilterTable(title: String, tuples: List[String], options: List[Boolean], filterableTable: Filterable, fullScreen: Boolean, screen: Screen, tg: TextGraphics)
+	extends OptionTable(title, tuples, options, filterableTable, fullScreen, screen, tg) {
 	
 	override def switchOption(r: List[String]) = {
 		settings.toList foreach {
@@ -50,12 +50,35 @@ class FilterTable(title: String, tuples: List[String], options: List[Boolean], f
 				settings = settings.updated(s, true)
 			case _ => ()
 		}
-		filteredTable.setFilterFunction(filterFunction)
-		filteredTable.updateValues
+		filterableTable.setFilterFunction(filterFunction)
+		filterableTable.updateValues
 	}
 	
 	def filterFunction = {
 		t: List[String] =>
 			settings.getOrElse(t(2), false)
+	}
+}
+
+class SortByTable(title: String, var index: Int, sortableTable: Sortable, fullScreen: Boolean, screen: Screen, tg: TextGraphics)
+	extends OptionTable(title, sortableTable.getTitles, sortableTable.getTitles.zipWithIndex map (t =>
+			t match {
+				case (_, i) if i == index => true
+				case _ => false
+			}), sortableTable, fullScreen, screen, tg) {
+	val sortingTitles = sortableTable.getTitles
+	
+	override def switchOption(r: List[String]) = {
+		sortingTitles.zipWithIndex foreach {
+			case (s,i) if r(1) == s  =>
+				index = i
+				settings = settings.updated(s, true)
+			case (s,i) if r(1) != s =>
+				settings = settings.updated(s, false)
+			case _ => ()
+		}
+		sortableTable.sortByIndex(index)
+		sortableTable.updateValues
+		updateValues
 	}
 }
