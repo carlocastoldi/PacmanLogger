@@ -21,7 +21,7 @@ class Logger(var logs: List[List[String]]) {
 	val mainTable = new Table(titles, logs, true, screen, textGraphics) with Filterable with Sortable with Cursor
 	val filters = logs.map((l: List[String]) => l(1)).distinct.sortWith(_<_)
 	val filterTable = new FilterTable("Filter By", filters, 1, mainTable, false, screen, textGraphics) with OptionCursor
-	val sortByTable = new SortByTable("Sort By", 1, mainTable, false, screen, textGraphics) with OptionCursor
+	val sortByTable = new SortByTable("Sort By", 0, mainTable, false, screen, textGraphics) with OptionCursor
 	
 	var focussedTable: Cursor = mainTable
 	var mainTableOffset = 0
