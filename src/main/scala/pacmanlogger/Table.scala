@@ -5,7 +5,7 @@ import com.googlecode.lanterna.screen._
 import com.googlecode.lanterna.graphics._
 import com.googlecode.lanterna.terminal._
 
-class Table(val titles: List[String], var tuples: List[List[String]], fullScreen: Boolean, screen: Screen, tg: TextGraphics)
+class Table(val titles: List[String], var tuples: List[List[String]], fullScreen: Boolean, val screen: Screen, val tg: TextGraphics)
 	extends AbstractTable {
 
 	var colWidths = new Array[Int](titles.length)
@@ -39,23 +39,25 @@ class Table(val titles: List[String], var tuples: List[List[String]], fullScreen
 		tuplesLength = tuples.length
 	}
 
-	override def getScreen = screen
-	override def getTextGraphics = tg
 	override def getFirstRow = firstRow
 
 	def isLastRow = firstRow + nRows == tuplesLength + 1
 
-	override def draw(terminalSize: TerminalSize, offset: Integer) {
+	override def draw(offset: Int) {
 		calcColWidths
-		tg.setForegroundColor(TextColor.ANSI.BLACK)
-		tg.setBackgroundColor(TextColor.ANSI.GREEN)
-		drawRow(titles, offset, 0)
+		drawHeader(offset)
 		tg.setForegroundColor(TextColor.ANSI.CYAN)
 		tg.setBackgroundColor(TextColor.ANSI.DEFAULT)
 		val localRows = rows
 		localRows.zipWithIndex foreach {
 			case (r, i) => drawRow(r, offset, i + 1)
 		}
+	}
+	
+	def drawHeader(offset: Int) {
+		tg.setForegroundColor(TextColor.ANSI.BLACK)
+		tg.setBackgroundColor(TextColor.ANSI.GREEN)
+		drawRow(titles, offset, 0)
 	}
 
 	override def drawRow(titles: List[String], column: Int, row: Int) {
