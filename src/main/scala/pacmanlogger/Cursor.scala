@@ -4,7 +4,6 @@ import com.googlecode.lanterna._
 import com.googlecode.lanterna.graphics._
 
 trait Cursor extends AbstractTable {
-	var cursorAbsolutePos = 0
 	var cursorRelativePos = 0
 	val screen = getScreen
 	val tg = getTextGraphics
@@ -17,6 +16,8 @@ trait Cursor extends AbstractTable {
 			cursorRelativePos = terminalSize.getRows - 3
 		drawCursor(offset)
 	}
+
+        def getCursorAbsolutePos = cursorRelativePos + getFirstRow
 
 	def moveCursor(n: Int, tg: TextGraphics, offset: Int, terminalSize: TerminalSize) {
 		rows_ = getRows

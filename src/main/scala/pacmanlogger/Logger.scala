@@ -82,7 +82,7 @@ class Logger(var logs: List[List[String]]) {
 		var offset = off
 		val columns = terminalSize.getColumns()
 		val row = terminalSize.getRows - 1
-		var total = "Total "+mainTable.getAllRows.length
+		var total = (mainTable.getCursorAbsolutePos + 1) + "/" + mainTable.getAllRows.length
 		commands foreach {
 			case (k, c) =>
 				textGraphics.setForegroundColor(TextColor.ANSI.CYAN)
