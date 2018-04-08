@@ -14,6 +14,8 @@ trait Cursor extends AbstractTable {
 			cursorRelativePos = terminalSize.getRows - 3
 		drawCursor(offset)
 	}
+	
+	def getCursorAbsolutePos = cursorRelativePos + getFirstRow
 
 	def moveCursor(n: Int, offset: Int) {
 		rows_ = getRows
@@ -26,18 +28,13 @@ trait Cursor extends AbstractTable {
 			case i if !isLastRow =>
 				var firstRow_ = getFirstRow
 				scrollRows(n)
-
 				delCursor(offset)
 				cursorRelativePos += n - (getFirstRow - firstRow_)
-
-				if (cursorRelativePos < 0) {
+				if (cursorRelativePos < 0)
 					cursorRelativePos = 0
-				}
-
-				if (cursorRelativePos > nRows_ - 1) {
+				else if (cursorRelativePos > nRows_ - 1)
 					cursorRelativePos = nRows_ - 1
-				}
-
+				
 				drawCursor(offset)
 				draw(offset)
 			case _ => ()
@@ -63,7 +60,6 @@ trait Cursor extends AbstractTable {
 	}
 
 	def delCursor(offset: Int) {
-		updateValues
 		rows_ = getRows
 		nRows_ = rows_.length
 		tg.setForegroundColor(TextColor.ANSI.CYAN)
@@ -77,7 +73,6 @@ trait Cursor extends AbstractTable {
 	}
 
 	def drawCursor(offset: Int) {
-		updateValues
 		rows_ = getRows
 		nRows_ = rows_.length
 		tg.setForegroundColor(TextColor.ANSI.BLACK)

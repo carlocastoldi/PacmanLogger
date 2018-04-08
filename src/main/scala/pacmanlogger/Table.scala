@@ -48,8 +48,7 @@ class Table(val titles: List[String], var tuples: List[List[String]], fullScreen
 		drawHeader(offset)
 		tg.setForegroundColor(TextColor.ANSI.CYAN)
 		tg.setBackgroundColor(TextColor.ANSI.DEFAULT)
-		val localRows = rows
-		localRows.zipWithIndex foreach {
+		rows.zipWithIndex foreach {
 			case (r, i) => drawRow(r, offset, i + 1)
 		}
 	}
@@ -77,25 +76,23 @@ class Table(val titles: List[String], var tuples: List[List[String]], fullScreen
 	}
 
 	override def scrollRows(n: Int) {
-		val totalLength = tuplesLength
-		val rowsLength = nRows
-		if (firstRow + n >= 0 && firstRow + n + rowsLength <= totalLength)
+		if (firstRow + n >= 0 && firstRow + n + nRows <= tuplesLength)
 			firstRow += n
-		else if (firstRow + n >= 0 && firstRow + rowsLength <= totalLength)
-			firstRow = totalLength - rowsLength
-		else if (firstRow > 0 && firstRow + n + rowsLength <= totalLength)
+		else if (firstRow + n >= 0 && firstRow + nRows <= tuplesLength)
+			firstRow = tuplesLength - nRows
+		else if (firstRow > 0 && firstRow + n + nRows <= tuplesLength)
 			firstRow = 0
+		rows = updateRows
 	}
 
 	override def scrollStart {
 		firstRow = 0
+		rows = updateRows
 	}
 
 	override def scrollEnd {
-		val totalLength = tuplesLength
-		val rowsLength = nRows
-
-		firstRow = totalLength - rowsLength
+		firstRow = tuplesLength - nRows
+		rows = updateRows
 	}
 
 	def calcColWidths {
