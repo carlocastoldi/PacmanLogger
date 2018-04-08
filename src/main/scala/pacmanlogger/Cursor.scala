@@ -4,7 +4,6 @@ import com.googlecode.lanterna._
 import com.googlecode.lanterna.graphics._
 
 trait Cursor extends AbstractTable {
-	var cursorAbsolutePos = 0
 	var cursorRelativePos = 0
 	var rows_ = getRows
 	var nRows_ = rows_.length
