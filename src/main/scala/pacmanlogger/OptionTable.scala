@@ -55,6 +55,7 @@ class FilterTable(title: String, tuples: List[String], index: Int, options: List
 		}
 		filterableTable.setFilterFunction(filterFunction)
 		filterableTable.updateValues
+		updateValues
 	}
 	
 	def filterFunction = {
