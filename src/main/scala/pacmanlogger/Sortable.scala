@@ -6,7 +6,7 @@ import com.googlecode.lanterna.graphics._
 
 trait Sortable extends Table {
 	var sortingIndex = 0
-	tuples = tuples.sortWith{_(sortingIndex)<_(sortingIndex)}
+	updateValues
 	
 	override def updateValues = {
 		super.updateValues
@@ -24,7 +24,7 @@ trait Sortable extends Table {
 	
 	def sortByIndex(i: Int) = {
 		sortingIndex = i
-		tuples = tuples.sortWith{_(sortingIndex)<_(sortingIndex)}
+		updateValues
 	}
 	
 	def getTitles = titles
