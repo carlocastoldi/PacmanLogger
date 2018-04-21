@@ -21,7 +21,7 @@ class Logger(var logs: List[List[String]]) {
 	val mainTable = new Table(titles, logs, true, screen, textGraphics) with Filterable with Sortable with Cursor
 	val filters = logs.map((l: List[String]) => l(1)).distinct.sortWith(_<_)
 	val filterTable = new FilterTable("Filter By", filters, 1, mainTable, false, screen, textGraphics) with OptionCursor
-	val sortByTable = new SortByTable("Sort By", 1, mainTable, false, screen, textGraphics) with OptionCursor
+	val sortByTable = new SortByTable("Sort By", 0, mainTable, false, screen, textGraphics) with OptionCursor
 	
 	var focussedTable: Cursor = mainTable
 	var mainTableOffset = 0
@@ -45,17 +45,17 @@ class Logger(var logs: List[List[String]]) {
 				Thread.sleep(100)
 			}
 		}
-		mainTable.draw(terminalSize, mainTableOffset)
+		mainTable.draw(mainTableOffset)
 		var keyStroke = screen.pollInput()
 		while (keyStroke == null || (KeyType.F3 != keyStroke.getKeyType && 'q' != keyStroke.getCharacter) || focussedTable != mainTable) {
 			if (keyStroke != null) {
 				keyStroke.getKeyType match {
-					case KeyType.ArrowDown => focussedTable.moveCursor(1, textGraphics, focussedTableOffset, terminalSize)
-					case KeyType.ArrowUp => focussedTable.moveCursor(-1, textGraphics, focussedTableOffset, terminalSize)
-					case KeyType.PageDown => focussedTable.moveCursor(terminalSize.getRows - 2, textGraphics, focussedTableOffset, terminalSize)
-					case KeyType.Home => focussedTable.moveCursorStart(textGraphics, focussedTableOffset, terminalSize)
-					case KeyType.End => focussedTable.moveCursorEnd(textGraphics, focussedTableOffset, terminalSize)
-					case KeyType.PageUp => focussedTable.moveCursor(-(terminalSize.getRows - 2), textGraphics, focussedTableOffset, terminalSize)
+					case KeyType.ArrowDown => focussedTable.moveCursor(1, focussedTableOffset)
+					case KeyType.ArrowUp => focussedTable.moveCursor(-1, focussedTableOffset)
+					case KeyType.PageDown => focussedTable.moveCursor(terminalSize.getRows - 2, focussedTableOffset)
+					case KeyType.Home => focussedTable.moveCursorStart(focussedTableOffset)
+					case KeyType.End => focussedTable.moveCursorEnd(focussedTableOffset)
+					case KeyType.PageUp => focussedTable.moveCursor(-(terminalSize.getRows - 2), focussedTableOffset)
 					case KeyType.F4 => state.f4
 					case KeyType.F5 => state.f5
 					case KeyType.Escape => state.esc
@@ -72,9 +72,9 @@ class Logger(var logs: List[List[String]]) {
 	}
 
 	def draw(state: LoggerState) {
-		mainTable.draw(terminalSize, mainTableOffset)
+		mainTable.draw(mainTableOffset)
 		if (mainTableOffset > 0)
-			focussedTable.draw(terminalSize, 0)
+			focussedTable.draw(0)
 		drawFoot(state.getFoot, 0)
 	}
 
@@ -82,7 +82,7 @@ class Logger(var logs: List[List[String]]) {
 		var offset = off
 		val columns = terminalSize.getColumns()
 		val row = terminalSize.getRows - 1
-		var total = "Total "+mainTable.getAllRows.length
+		var total = (mainTable.getCursorAbsolutePos + 1) + "/" + mainTable.getAllRows.length
 		commands foreach {
 			case (k, c) =>
 				textGraphics.setForegroundColor(TextColor.ANSI.CYAN)

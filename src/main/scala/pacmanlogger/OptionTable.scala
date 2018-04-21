@@ -55,6 +55,7 @@ class FilterTable(title: String, tuples: List[String], index: Int, options: List
 		}
 		filterableTable.setFilterFunction(filterFunction)
 		filterableTable.updateValues
+		updateValues
 	}
 	
 	def filterFunction = {
@@ -71,6 +72,7 @@ class SortByTable(title: String, var index: Int, sortableTable: Sortable, fullSc
 				case _ => false
 			}), sortableTable, fullScreen, screen, tg) {
 	val sortingTitles = sortableTable.getTitles
+	sortableTable.sortByIndex(index)
 	
 	override def switchOption(r: List[String]) = {
 		sortingTitles.zipWithIndex foreach {

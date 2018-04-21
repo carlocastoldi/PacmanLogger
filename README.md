@@ -5,11 +5,18 @@ An application with terminal GUI inspired by htop that makes Arch pacman's logs 
 ## Installation
 ### Dependencies
 Mandatory:
-  - Java (jre)
+   - Java (jre)
+
+Development dependencies:
+   - Scala (http://www.scala-lang.org/)
+   - lanterna-3.0.0 (https://github.com/mabe02/lanterna)
+   - scala-parser-combinators (https://github.com/scala/scala-parser-combinators)
 
 ### Package Manager
 #### Arch Linux
-Available via AUR here: https://aur.archlinux.org/packages/pacmanlogger-git/
+Available via AUR:
+   - https://aur.archlinux.org/packages/pacmanlogger/
+   - https://aur.archlinux.org/packages/pacmanlogger-git/
 
 ### Manual (sbt)
 Compiling:
