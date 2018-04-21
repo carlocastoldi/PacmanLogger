@@ -6,6 +6,10 @@ import com.googlecode.lanterna.graphics._
 import com.googlecode.lanterna.terminal._
 
 trait AbstractTable {
+	val screen: Screen
+	val tg: TextGraphics
+	var terminalSize: TerminalSize
+	var colWidths: Array[Int]
 	def getRows: List[List[String]]
 	def getAllRows: List[List[String]]
 	def updateValues: Unit
@@ -13,9 +17,8 @@ trait AbstractTable {
 	def scrollRows(n: Int): Unit
 	def scrollStart: Unit
 	def scrollEnd: Unit
-	def getScreen: Screen
 	def getFirstRow: Int
-	def getTextGraphics: TextGraphics
-	def draw(terminalSize: TerminalSize, offset: Integer)
+	def draw(offset: Int)
+	def drawHeader(offset: Int)
 	def drawRow(titles: List[String], column: Int, row: Int)
 }

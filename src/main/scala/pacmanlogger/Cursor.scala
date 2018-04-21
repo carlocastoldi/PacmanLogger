@@ -4,21 +4,20 @@ import com.googlecode.lanterna._
 import com.googlecode.lanterna.graphics._
 
 trait Cursor extends AbstractTable {
-	var cursorAbsolutePos = 0
 	var cursorRelativePos = 0
-	val screen = getScreen
-	val tg = getTextGraphics
 	var rows_ = getRows
 	var nRows_ = rows_.length
 
-	abstract override def draw(terminalSize: TerminalSize, offset: Integer) {
-		super.draw(terminalSize, offset)
+	abstract override def draw(offset: Int) {
+		super.draw(offset)
 		if (terminalSize.getRows - 3 < cursorRelativePos)
 			cursorRelativePos = terminalSize.getRows - 3
 		drawCursor(offset)
 	}
+	
+	def getCursorAbsolutePos = cursorRelativePos + getFirstRow
 
-	def moveCursor(n: Int, tg: TextGraphics, offset: Int, terminalSize: TerminalSize) {
+	def moveCursor(n: Int, offset: Int) {
 		rows_ = getRows
 		nRows_ = rows_.length
 		(cursorRelativePos + n) match {
@@ -29,44 +28,38 @@ trait Cursor extends AbstractTable {
 			case i if !isLastRow =>
 				var firstRow_ = getFirstRow
 				scrollRows(n)
-
 				delCursor(offset)
 				cursorRelativePos += n - (getFirstRow - firstRow_)
-
-				if (cursorRelativePos < 0) {
+				if (cursorRelativePos < 0)
 					cursorRelativePos = 0
-				}
-
-				if (cursorRelativePos > nRows_ - 1) {
+				else if (cursorRelativePos > nRows_ - 1)
 					cursorRelativePos = nRows_ - 1
-				}
-
+				
 				drawCursor(offset)
-				draw(terminalSize, offset)
+				draw(offset)
 			case _ => ()
 		}
 	}
 
-	def moveCursorStart(tg: TextGraphics, offset: Int, terminalSize: TerminalSize) {
+	def moveCursorStart(offset: Int) {
 		delCursor(offset)
 		cursorRelativePos = 0
 		drawCursor(offset)
 		scrollStart
-		draw(terminalSize, offset)
+		draw(offset)
 	}
 
-	def moveCursorEnd(tg: TextGraphics, offset: Int, terminalSize: TerminalSize) {
+	def moveCursorEnd(offset: Int) {
 		rows_ = getRows
 		nRows_ = rows_.length
 		delCursor(offset)
 		cursorRelativePos = nRows_ - 1
 		drawCursor(offset)
 		scrollEnd
-		draw(terminalSize, offset)
+		draw(offset)
 	}
 
 	def delCursor(offset: Int) {
-		updateValues
 		rows_ = getRows
 		nRows_ = rows_.length
 		tg.setForegroundColor(TextColor.ANSI.CYAN)
@@ -80,7 +73,6 @@ trait Cursor extends AbstractTable {
 	}
 
 	def drawCursor(offset: Int) {
-		updateValues
 		rows_ = getRows
 		nRows_ = rows_.length
 		tg.setForegroundColor(TextColor.ANSI.BLACK)
