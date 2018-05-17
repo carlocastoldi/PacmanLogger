@@ -26,10 +26,13 @@ class Logger(var logs: List[List[String]]) {
 	var focussedTable: Cursor = mainTable
 	var mainTableOffset = 0
 	var focussedTableOffset = mainTableOffset
+	
+	val mainTableState = new MainTableState(this, mainTable, screen)
+	val filterTableState = new FilterTableState(this, filterTable, screen)
+	val sortByTableState = new SortByTableState(this, sortByTable, screen)
+	var state: LoggerState = mainTableState
 
 	def start {
-		var state: LoggerState = new MainTableState(this, mainTable, screen)
-
 		val f = Future {
 			while (true) {
 				val newSize = screen.doResizeIfNecessary
@@ -62,13 +65,21 @@ class Logger(var logs: List[List[String]]) {
 					case KeyType.Character => handleCharacter(keyStroke, state)
 					case _ => ()
 				}
-				state = state.getNextState
 			}
 			draw(state)
 			screen.refresh()
 			keyStroke = screen.readInput
 		}
 		screen.close
+	}
+	
+	def handleCharacter(keyStroke: KeyStroke, state: LoggerState) {
+		keyStroke.getCharacter.toChar match {
+			case ' ' => state.space
+			case 'f' => state.f
+			case 's' => state.s
+			case _ => ()
+		}
 	}
 
 	def draw(state: LoggerState) {
@@ -97,14 +108,5 @@ class Logger(var logs: List[List[String]]) {
 
 		textGraphics.putString(offset, row, " " * (columns - offset))
 		textGraphics.putString(offset + columns - offset - total.length, row, total)
-	}
-
-	def handleCharacter(keyStroke: KeyStroke, state: LoggerState) {
-		keyStroke.getCharacter.toChar match {
-			case ' ' => state.space
-			case 'f' => state.f
-			case 's' => state.s
-			case _ => ()
-		}
 	}
 }
