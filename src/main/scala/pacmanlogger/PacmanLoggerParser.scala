@@ -1,5 +1,8 @@
 package pacmanlogger
 
+// import java.time.OffsetDateTime
+// import java.time.format.DateTimeFormatter
+
 import scala.util.parsing.combinator._
 //import java.util.GregorianCalendar
 
@@ -22,8 +25,19 @@ class PacmanLoggerParser extends JavaTokenParsers {
 
 	def fs = "filesystem:" <~ "[0-9]+".r <~ "package:" <~ "[0-9]+".r
 
-	def time = (fourDig <~ "-") ~ (twoDig <~ "-") ~ twoDig ~ twoDig ~ (":" ~> twoDig) ^^ {
-		case year ~ month ~ day ~ hour ~ minute => year+"-"+month+"-"+day+" "+hour+":"+minute //new GregorianCalendar(year.toInt, month.toInt, day.toInt, hour.toInt, minute.toInt)
+	def time = timezoneLess | timezone
+
+	def timezoneLess = (fourDig <~ "-") ~ (twoDig <~ "-") ~ twoDig ~ twoDig ~ (":" ~> twoDig) ^^ {
+		case year ~ month ~ day ~ hour ~ minute => year+"-"+month+"-"+day+" "+hour+":"+minute+":00" //new GregorianCalendar(year.toInt, month.toInt, day.toInt, hour.toInt, minute.toInt)
+	}
+	def timezone = (fourDig <~ "-") ~ (twoDig <~ "-") ~ twoDig ~ ("T" ~> twoDig <~ ":") ~ (twoDig <~ ":") ~
+		twoDig ~ ("+"|"-") ~ fourDig ^^ {
+		case year ~ month ~ day ~ hour ~ minute ~ second ~ sign ~ offset =>
+			val offsetHour: String = offset.substring(0,2)
+			val offsetMinute: String = offset.substring(2,4)
+			f"$year-$month-$day"+f"T$hour:$minute:$second$sign$offsetHour:$offsetMinute"
+			// val date = OffsetDateTime.parse(f"$year-$month-$day"+f"T$hour:$minute:$second$sign$offsetHour:$offsetMinute")
+			// date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
 	}
 	def action = ("downgraded" | "installed" | "removed" | "reinstalled" | "upgraded") ^^ { _ toUpperCase }
 	def pktName = "[a-zA-Z0-9\\+-_.]+".r <~ "("
